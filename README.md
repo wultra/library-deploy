@@ -1,11 +1,10 @@
 # Swift library deployment
 
-This repository contains a supporting script for our swift libraries deployment. 
-
-This documentation is using following constants:
+This repository contains a supporting script for our swift libraries deployment. The document is using following constants:
 
 - `${DEP_TOOL}` - path where you have cloned [this repository](https://github.com/lime-company/swift-library-deploy)
 - `${REPO}` - path to repository, containing library you're going to deploy
+
 
 ## Prepare library for deployment
 
@@ -17,11 +16,11 @@ that library has stable build, so:
 
 ### Prepare template files 
 
-Template files are textual files which version placeholder. The deploy script is doing following operations for each template file:
+Template files are textual files with version placeholder. The deploy script is doing following operations for each such file:
 
 - Checks whether template file exists
 - Checks whether destination file exists
-- Loads its content and replaces placeholder `%DEPLOY_VERSION%` with an actual version
+- Loads its content and replaces placeholder `%DEPLOY_VERSION%` with an actual version string
 - Stores final string into destination file 
 
 For swift projects, two files typically has to be updated with a new version:
@@ -31,7 +30,9 @@ For swift projects, two files typically has to be updated with a new version:
 
 You can look into our [LimeCore library for examples](https://github.com/lime-company/swift-lime-core/tree/develop/Deploy).
    
-### Prepare `.limedeploy` file:
+### Prepare `.limedeploy` file
+
+`.limedeploy` contains information about library deployment and the file must be stored in the root of the library:
 
 ```bash
 $ cd ${REPO}
@@ -76,12 +77,12 @@ The script will perform following steps:
    2. A tag for new version is created.
    3. Build of the library is tested (for swift projects, this typically executes `pod lib lint`)
 
-   The result is, that your local git repository will contain a prepared versioning files, tag with version
+   The result is that your local git repository will contain a prepared versioning files, tag with version
    and finally, you can be sure, that it's possible to build this version of the library.
 
-- **push** - pushes all changes to remote origin
+- **push** - pushes all changes to library's remote git repository
 
-- **deploy** - deploys build to public repository (for swift projects, it typically executes `pod trunk push`)
+- **deploy** - deploys build to a public repository (for swift projects, it typically executes `pod trunk push`)
 
 - **merge** - merges all changes to **master** branch
 
