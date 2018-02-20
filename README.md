@@ -40,7 +40,7 @@ $ touch .limedeploy
 $ open .limedeploy
 ```
 
-Last command will open empty `.limedeploy` file kn your preferred text editor. You can put following lines to the file 
+Last command will open empty `.limedeploy` file in your preferred text editor. You can put following lines to the file 
 (the file is regular bash script, so you should be familiar with bash syntax):
 
 ```bash
