@@ -27,6 +27,11 @@ function DO_DEPLOY
 {
 	local VER=$1
 	local DEPLOY_COMMAND=$2
+	local VERBOSE_SWITCH=""
+	
+	if [ x$VERBOSE == x2 ]; then
+	    VERBOSE_SWITCH="--verbose"
+	fi
 	
 	# validate variables and input parameters
 	VALIDATE_COCOAPODS
@@ -36,12 +41,12 @@ function DO_DEPLOY
 	if [ "$DEPLOY_COMMAND" == "prepare" ]; then
 		
 		LOG "----- Validating ${PODSPEC}..."
-		pod lib lint ${PODSPEC}
+		pod lib lint ${PODSPEC} ${VERBOSE_SWITCH}
 		
 	elif [ "$DEPLOY_COMMAND" == "deploy" ]; then
 		
 		LOG "----- Publishing ${PODSPEC}..."
-		pod trunk push ${PODSPEC}
+		pod trunk push ${PODSPEC} ${VERBOSE_SWITCH}
 		
 	else
 		FAILURE "deploy-swift-cocoapods.sh doesn't support '$DEPLOY_COMMAND' command"

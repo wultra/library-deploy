@@ -74,7 +74,7 @@ function VALIDATE_AND_SET_VERSION_STRING
 	fi
 	rx='^([0-9]+\.){2}(\*|[0-9]+)$'
 	if [[ ! "$1" =~ $rx ]]; then
-	 	FAILURE "Version string is invalid: '$1'"
+	 	WARNING "Version string is invalid: '$1'"
 	fi
 	if [ -z "$VERSION" ]; then
 		VERSION=$1
