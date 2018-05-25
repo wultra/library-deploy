@@ -13,7 +13,7 @@
 set -e
 set +v
 VERBOSE=1
-
+LAST_LOG_IS_LINE=0
 # -----------------------------------------------------------------------------
 # FAILURE prints error to stderr and exits the script with error code 1
 # -----------------------------------------------------------------------------
@@ -28,24 +28,98 @@ function FAILURE
 function WARNING
 {
 	echo "$CMD: Warning: $@" 1>&2
+	LAST_LOG_IS_LINE=0
 }
 # -----------------------------------------------------------------------------
-# LOG prints all parameters to stdout if VERBOSE is greater than 0
+# LOG 
+#    Prints all parameters to stdout if VERBOSE is greater than 0
+# LOG_LINE 
+#    prints dashed line to stdout if VERBOSE is greater than 0
+#    Function also prevents that two lines will never be displayed subsequently
+# DEBUG_LOG 
+#    Prints all parameters to stdout if VERBOSE is greater than 1
 # -----------------------------------------------------------------------------
 function LOG
 {
 	if [ $VERBOSE -gt 0 ]; then
 		echo "$CMD: $@"
+		LAST_LOG_IS_LINE=0
 	fi
 }
-# -----------------------------------------------------------------------------
-# DEBUG_LOG prints all parameters to stdout if VERBOSE is greater than 1
-# -----------------------------------------------------------------------------
+function LOG_LINE
+{
+	if [ $LAST_LOG_IS_LINE -eq 0 ]; then
+		echo "$CMD: -----------------------------------------------------------------------------"
+		LAST_LOG_IS_LINE=1
+	fi
+}
 function DEBUG_LOG
 {
 	if [ $VERBOSE -gt 1 ]; then
 		echo "$CMD: $@"
+		LAST_LOG_IS_LINE=0
 	fi	
+}
+# -----------------------------------------------------------------------------
+# PROMPT_YES_FOR_CONTINUE asks user whether script should continue
+#
+# Parameters:
+# - $@ optional prompt
+# -----------------------------------------------------------------------------
+function PROMPT_YES_FOR_CONTINUE
+{
+	local prompt="$@"
+	local answer
+	if [ -z "$prompt" ]; then
+		prompt="Would you like to continue?"
+	fi
+	read -p "$prompt (type y or yes): " answer
+	case "$answer" in
+		y | yes | Yes | YES)
+			LAST_LOG_IS_LINE=0
+			return
+			;;
+		*)
+			FAILURE "Aborted by user."
+			;;
+	esac
+}
+# -----------------------------------------------------------------------------
+# REQUIRE_COMMAND uses "which" buildin command to test existence of requested
+# tool on the system.
+#
+# Parameters:
+# - $1 - tool to test (for example fastlane, pod, etc...)
+# -----------------------------------------------------------------------------
+function REQUIRE_COMMAND
+{
+	set +e
+	local tool=$1
+	local path=`which $tool`
+	if [ -z $path ]; then
+		FAILURE "$tool: command not found."
+	fi
+	set -e
+	DEBUG_LOG "$tool: found at $path"
+}
+# -----------------------------------------------------------------------------
+# REQUIRE_COMMAND_PATH is similar to REQUIRE_COMMAND, but on success, prints
+# path to stdout. You can use this function to check tool and acquire path to 
+# variable: TOOL_PATH=$(REQUIRE_COMMAND_PATH tool)
+#
+# Parameters:
+# - $1 - tool to test (for example fastlane, pod, etc...)
+# -----------------------------------------------------------------------------
+function REQUIRE_COMMAND_PATH
+{
+	set +e
+	local tool=$1
+	local path=`which $tool`
+	if [ -z $path ]; then
+		FAILURE "$tool: command not found."
+	fi
+	set -e
+	echo $path
 }
 # -----------------------------------------------------------------------------
 # Validates "verbose" command line switch and adjusts VERBOSE global variable
@@ -74,7 +148,7 @@ function VALIDATE_AND_SET_VERSION_STRING
 	fi
 	rx='^([0-9]+\.){2}(\*|[0-9]+)$'
 	if [[ ! "$1" =~ $rx ]]; then
-	 	WARNING "Version string is invalid: '$1'"
+	 	FAILURE "Version string is invalid: '$1'"
 	fi
 	if [ -z "$VERSION" ]; then
 		VERSION=$1
@@ -116,7 +190,6 @@ function LOAD_API_CREDENTIALS
 function PUSH_DIR
 {
 	if [ $VERBOSE -gt 1 ]; then
-		LOG "Pushing directory: $1"
 		pushd "$1"
 	else
 		pushd "$1" > /dev/null
@@ -125,11 +198,41 @@ function PUSH_DIR
 function POP_DIR
 {
 	if [ $VERBOSE -gt 1 ]; then
-		LOG "Popping directory"
 		popd
 	else
 		popd > /dev/null
 	fi
+}
+
+###############################################################################
+# Self update function
+#
+# Why?
+#  - We have copy of this script in several repositiories, so it would be great
+#    to simply self update it from one central point
+# How?
+#  - type:  sh common-functions.sh selfupdate
+ # -----------------------------------------------------------------------------
+function __COMMON_FUNCTIONS_SELF_UPDATE
+{
+	local self=$0
+	local backup=$self.backup
+	local remote="https://raw.githubusercontent.com/lime-company/swift-library-deploy/master/common-functions.sh"
+	LOG_LINE
+	LOG "This script is going to update itself:"
+	LOG "  source : $remote"
+	LOG "    dest : $self"
+	LOG_LINE
+	PROMPT_YES_FOR_CONTINUE
+	cp $self $backup
+	wget $remote -O $self
+	LOG_LINE
+	LOG "Update looks good. Now you can:"
+	LOG "  - press CTRL+C to cancel next step" 
+	LOG "  - or type 'y' to remove backup file"
+	LOG_LINE
+	PROMPT_YES_FOR_CONTINUE "Would you like to remove backup file?"
+	rm $backup
 }
 
 ###############################################################################
@@ -145,4 +248,8 @@ CMD=$(basename $0)
 TOP="`( cd \"$TOP\" && pwd )`"
 if [ -z "$TOP" ]; then
     FAILURE "Current dir is not accessible."
+fi
+
+if [ "$CMD" == "common-functions.sh" ] && [ "$1" == "selfupdate" ]; then
+	__COMMON_FUNCTIONS_SELF_UPDATE
 fi
