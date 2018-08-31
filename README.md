@@ -2,7 +2,7 @@
 
 This repository contains a supporting script for our swift libraries deployment. The document is using following constants:
 
-- `${DEP_TOOL}` - path where you have cloned [this repository](https://github.com/lime-company/swift-library-deploy)
+- `${DEP_TOOL}` - path where you have cloned [this repository](https://github.com/wultra/swift-library-deploy)
 - `${REPO}` - path to repository, containing library you're going to deploy
 
 
@@ -28,7 +28,7 @@ For swift projects, two files typically has to be updated with a new version:
 - `YourLibrary.podspec` - a file declaring library for cocoapods dependency manager
 - `Info.plist` - a info file created by Xcode.
 
-You can look into our [LimeCore library for examples](https://github.com/lime-company/swift-lime-core/tree/develop/Deploy).
+You can look into our [LimeCore library for examples](https://github.com/wultra/swift-lime-core/tree/develop/Deploy).
    
 ### Prepare `.limedeploy` file
 
