@@ -106,7 +106,7 @@ function LOAD_DEPLOY_INFO_FILE
 		FAILURE "Repository doesn't contain '${DEPLOY_INFO}' file."
 	fi
 	
-	local MODE_IMPL="${TOP}/deploy-${DEPLOY_MODE}.sh"
+	local MODE_IMPL="${TOP}/do-${DEPLOY_MODE}.sh"
 	if [ ! -f "${MODE_IMPL}" ]; then
 		FAILURE "There's no deployment script for '${DEPLOY_MODE}' mode."
 	fi
@@ -122,6 +122,18 @@ function LOAD_DEPLOY_INFO_FILE
 	
 	####
 	POP_DIR
+}
+
+# -----------------------------------------------------------------------------
+# Executes "DO_DEPLOY" or custom function with given parameters
+# -----------------------------------------------------------------------------
+function EXECUTE_DO_DEPLOY
+{
+    if [ -z "$DO_DEPLOY_CUSTOM_FUNCTION" ]; then
+        DO_DEPLOY "$@"
+    else
+        $DO_DEPLOY_CUSTOM_FUNCTION "$@"
+    fi
 }
 
 # -----------------------------------------------------------------------------
@@ -281,22 +293,22 @@ PUSH_DIR "${REPO_DIR}"
 case "$COMMAND" in
 	prepare)
 		PREPARE_VERSIONING_FILES
-		DO_DEPLOY $VERSION 'prepare'
+		EXECUTE_DO_DEPLOY $VERSION 'prepare'
 		;;
 	push)
 		PUSH_VERSIONING_FILES
 		;;
 	deploy)
-		DO_DEPLOY $VERSION 'deploy'
+		EXECUTE_DO_DEPLOY $VERSION 'deploy'
 		;;
 	merge)
 		MERGE_TO_MASTER
 		;;
 	all)
 		PREPARE_VERSIONING_FILES
-		DO_DEPLOY $VERSION 'prepare'
+		EXECUTE_DO_DEPLOY $VERSION 'prepare'
 		PUSH_VERSIONING_FILES
-		DO_DEPLOY $VERSION 'deploy'
+		EXECUTE_DO_DEPLOY $VERSION 'deploy'
 		MERGE_TO_MASTER
 		;;	
 esac

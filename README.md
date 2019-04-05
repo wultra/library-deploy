@@ -1,8 +1,8 @@
-# Swift library deployment
+# Library deployment
 
-This repository contains a supporting script for our swift libraries deployment. The document is using following constants:
+This repository contains a supporting script for our libraries deployment. The document is using following constants:
 
-- `${DEP_TOOL}` - path where you have cloned [this repository](https://github.com/wultra/swift-library-deploy)
+- `${DEP_TOOL}` - path where you have cloned [this repository](https://github.com/wultra/library-deploy)
 - `${REPO}` - path to repository, containing library you're going to deploy
 
 
@@ -13,6 +13,7 @@ that library has stable build, so:
 
 - You can really compile the library without errors
 - In case of cocoapods, you have already valid `podspec` file
+- In case of gradle, you have properly configured uploading to bintray.
 
 ### Prepare template files 
 
@@ -27,12 +28,16 @@ For swift projects, two files typically has to be updated with a new version:
 
 - `YourLibrary.podspec` - a file declaring library for cocoapods dependency manager
 - `Info.plist` - a info file created by Xcode.
+- You can look into our [LimeCore library for examples](https://github.com/wultra/swift-lime-core/tree/develop/Deploy).
 
-You can look into our [LimeCore library for examples](https://github.com/wultra/swift-lime-core/tree/develop/Deploy).
+For gradle projects, one file has to be updated with a new version:
+
+- `gradle.properties` - a file which typically contains a version of library
+- You can look into our [passphrase-meter](https://github.com/wultra/passphrase-meter/tree/develop/Deploy) library for examples. 
    
 ### Prepare `.limedeploy` file
 
-`.limedeploy` contains information about library deployment and the file must be stored in the root of the library:
+`.limedeploy` contains information about library deployment and the file must be stored in the root of the repository:
 
 ```bash
 $ cd ${REPO}
@@ -46,7 +51,7 @@ Last command will open empty `.limedeploy` file in your preferred text editor. Y
 ```bash
 DEPLOY_POD_NAME='LimeCore'
 DEPLOY_VERSIONING_FILES=( "Deploy/LimeCore.podspec,LimeCore.podspec" "Deploy/Info.plist,Source/Info.plist" )
-DEPLOY_MODE='swift-cocoapods'
+DEPLOY_MODE='cocoapods'
 ```
 
 Each line contains assignment to one global variable:
@@ -54,7 +59,27 @@ Each line contains assignment to one global variable:
 - `DEPLOY_POD_NAME` - contains name of cocoa pod, for example `LimeCore`
 - `DEPLOY_VERSIONING_FILES` - contains array defining template files and destination versioning files. Each string in the array contains two, 
   comma separated relative paths: first file is a source template, second is path to actual versioning file.
-- `DEPLOY_MODE` contains mode of deployment. Currently only `swift-cocoapods` is supported.
+- `DEPLOY_MODE` contains mode of deployment. Following modes are supported:
+  - `cocoapods` - deployment with using `pod` tool
+  - `gradle` - deployment with using `gradlew` tool
+  - `more` - for a complex deployments with multiple deployment targets at once
+
+### `cocoapods` mode parameters
+
+- `DEPLOY_POD_NAME` is required parameter, specifying which pod is going to be published
+
+### `gradle` mode parameters
+
+- `DEPLOY_LIB_NAME` is required parameter, specifying name of library. The name will be used for git tag comment, created for the new version.
+- `DEPLOY_GRADLE_PARAMS` is required and specifying command line parameters for `gradle` for deployment task. For example: `clean build install bintrayUpload`
+- `DEPLOY_GRADLE_PREPARE_PARAMS` is optional and specifying command line parameters for `gradle` for prepare task. If not specified, then `clean assembleRelease` is used.
+- `DEPLOY_GRADLE_PATH` is optional and specifying path to `gradlew` wrapper script. If not specified, then path to repository is used.
+
+### `more` mode parameters
+
+- `DEPLOY_LIB_NAME` is required parameter, specifying name of library. The name will be used for git tag comment, created for the new version.
+- `DEPLOY_MORE_TARGETS` is required parameters, specifying which other modes has to be executed. For example: `gradle cocoapods`
+
 
 
 ## Publish version
@@ -66,7 +91,7 @@ Before you publish a new version, make sure that:
 
 To publish a new version of build, simply type:
 ```bash
-$ ${DEP_TOOL}/lime-deploy-build.sh  ${REPO}  ${NEW_VERSION}
+$ ${DEP_TOOL}/deploy-build.sh  ${REPO}  ${NEW_VERSION}
 ```
 
 The script will perform following steps:
@@ -86,4 +111,4 @@ The script will perform following steps:
 
 - **merge** - merges all changes to **master** branch
 
-If you need to make custom changes, then you can perform each steps individually. Type `${DEP_TOOL}/lime-deploy-build.sh -h` for details.
+If you need to make custom changes, then you can perform each steps individually. Type `${DEP_TOOL}/deploy-build.sh -h` for details.
