@@ -49,12 +49,12 @@ function DO_DEPLOY
 		pod trunk push ${PODSPEC} ${VERBOSE_SWITCH}
 		
 	else
-		FAILURE "deploy-swift-cocoapods.sh doesn't support '$DEPLOY_COMMAND' command"
+		FAILURE "do-cocoapods.sh doesn't support '$DEPLOY_COMMAND' command"
 	fi
 }
 
 # -----------------------------------------------------------------------------
-# Deploys build for swift, with using cocoapods. Script is executed in ${REPO_DIR}
+# Prepares tag message for library. Script is executed in ${REPO_DIR}
 # Parameters:
 #   $1   - version
 #
