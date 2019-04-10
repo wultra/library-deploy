@@ -37,6 +37,10 @@ function USAGE
 	echo "    -v2               print full build log with rich debug info"
 	echo "    -h | --help       print this help information"
 	echo ""
+	echo "    -dm target | --do-more-target target"
+	echo "                      specifies target for do-more.sh deployment"
+	echo "                      If specified, then only target will be executed"
+	echo ""
 	exit $1
 }
 
@@ -54,6 +58,7 @@ STANDARD_BRANCH=0
 COMMAND='all'
 VERSION=''
 REPO_DIR=''
+DO_MORE_TARGET=''
 
 # -----------------------------------------------------------------------------
 # Validate whether git branch is 'develop'
@@ -251,6 +256,10 @@ do
 		prepare | push | deploy | merge)
 			COMMAND=$opt
 			;;
+		-dm | --do-more-target)
+		    DO_MORE_TARGET="$2"
+		    shift
+		    ;;
 		*)
 			if [ x$PINDEX == x0 ]; then
 				REPO_DIR="$opt"

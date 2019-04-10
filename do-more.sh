@@ -37,6 +37,12 @@ function DO_DEPLOY_more
         if [ "$target" == "more" ]; then
             FAILURE "do-more.sh cannot execute itself."
         fi
+        if [ ! -z "$DO_MORE_TARGET" ]; then
+            if [ "$target" != "$DO_MORE_TARGET" ]; then
+                LOG "----- Skipping '$target', because only '$DO_MORE_TARGET' is selected for execution..."
+                continue
+            fi
+        fi
         local MODE_IMPL="${TOP}/do-${target}.sh"
     	if [ ! -f "${MODE_IMPL}" ]; then
     		FAILURE "There's no deployment script for '${target}' mode."
