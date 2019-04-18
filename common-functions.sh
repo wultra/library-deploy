@@ -38,6 +38,8 @@ function WARNING
 #    Function also prevents that two lines will never be displayed subsequently
 # DEBUG_LOG 
 #    Prints all parameters to stdout if VERBOSE is greater than 1
+# EXIT_SUCCESS
+#    print dashed line and "Success" text and exit process with code 0
 # -----------------------------------------------------------------------------
 function LOG
 {
@@ -59,6 +61,12 @@ function DEBUG_LOG
 		echo "$CMD: $@"
 		LAST_LOG_IS_LINE=0
 	fi	
+}
+function EXIT_SUCCESS
+{
+    LOG_LINE
+    LOG "Success"
+    exit 0
 }
 # -----------------------------------------------------------------------------
 # PROMPT_YES_FOR_CONTINUE asks user whether script should continue
