@@ -38,6 +38,8 @@ function WARNING
 #    Function also prevents that two lines will never be displayed subsequently
 # DEBUG_LOG 
 #    Prints all parameters to stdout if VERBOSE is greater than 1
+# EXIT_SUCCESS
+#    print dashed line and "Success" text and exit process with code 0
 # -----------------------------------------------------------------------------
 function LOG
 {
@@ -48,7 +50,7 @@ function LOG
 }
 function LOG_LINE
 {
-	if [ $LAST_LOG_IS_LINE -eq 0 ]; then
+	if [ $LAST_LOG_IS_LINE -eq 0 ] && [ $VERBOSE -gt 0 ]; then
 		echo "$CMD: -----------------------------------------------------------------------------"
 		LAST_LOG_IS_LINE=1
 	fi
@@ -59,6 +61,12 @@ function DEBUG_LOG
 		echo "$CMD: $@"
 		LAST_LOG_IS_LINE=0
 	fi	
+}
+function EXIT_SUCCESS
+{
+    LOG_LINE
+    LOG "Success"
+    exit 0
 }
 # -----------------------------------------------------------------------------
 # PROMPT_YES_FOR_CONTINUE asks user whether script should continue
@@ -143,6 +151,7 @@ function SET_VERBOSE_LEVEL_FROM_SWITCH
 #  - $MD = mkdir -p [-v]
 #  - $RM = rm -f [-v]
 #  - $CP = cp [-v]
+#  - $MV = mv [-v]
 # -----------------------------------------------------------------------------
 function UPDATE_VERBOSE_COMMANDS
 {
@@ -151,11 +160,13 @@ function UPDATE_VERBOSE_COMMANDS
 		CP="cp"
 		RM="rm -f"
 		MD="mkdir -p"
+		MV="mv"
 	else
 		# verbose
 		CP="cp -v"
 		RM="rm -f -v"
 		MD="mkdir -p -v"
+		MV="mv -v"
 	fi
 }
 # -----------------------------------------------------------------------------

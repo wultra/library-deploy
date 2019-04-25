@@ -323,3 +323,5 @@ case "$COMMAND" in
 esac
 ####
 POP_DIR
+
+EXIT_SUCCESS
