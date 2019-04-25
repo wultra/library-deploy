@@ -151,6 +151,7 @@ function SET_VERBOSE_LEVEL_FROM_SWITCH
 #  - $MD = mkdir -p [-v]
 #  - $RM = rm -f [-v]
 #  - $CP = cp [-v]
+#  - $MV = mv [-v]
 # -----------------------------------------------------------------------------
 function UPDATE_VERBOSE_COMMANDS
 {
@@ -159,11 +160,13 @@ function UPDATE_VERBOSE_COMMANDS
 		CP="cp"
 		RM="rm -f"
 		MD="mkdir -p"
+		MV="mv"
 	else
 		# verbose
 		CP="cp -v"
 		RM="rm -f -v"
 		MD="mkdir -p -v"
+		MV="mv -v"
 	fi
 }
 # -----------------------------------------------------------------------------
