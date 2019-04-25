@@ -50,7 +50,7 @@ function LOG
 }
 function LOG_LINE
 {
-	if [ $LAST_LOG_IS_LINE -eq 0 ]; then
+	if [ $LAST_LOG_IS_LINE -eq 0 ] && [ $VERBOSE -gt 0 ]; then
 		echo "$CMD: -----------------------------------------------------------------------------"
 		LAST_LOG_IS_LINE=1
 	fi
