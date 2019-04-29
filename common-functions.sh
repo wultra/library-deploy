@@ -14,6 +14,36 @@ set -e
 set +v
 VERBOSE=1
 LAST_LOG_IS_LINE=0
+###############################################################################
+# Self update function
+#
+# Why?
+#  - We have copy of this script in several repositiories, so it would be great
+#    to simply self update it from one central point
+# How?
+#  - type:  sh common-functions.sh selfupdate
+ # -----------------------------------------------------------------------------
+function __COMMON_FUNCTIONS_SELF_UPDATE
+{
+	local self=$0
+	local backup=$self.backup
+	local remote="https://raw.githubusercontent.com/wultra/library-deploy/master/common-functions.sh"
+	LOG_LINE
+	LOG "This script is going to update itself:"
+	LOG "  source : $remote"
+	LOG "    dest : $self"
+	LOG_LINE
+	PROMPT_YES_FOR_CONTINUE
+	cp $self $backup
+	wget $remote -O $self
+	LOG_LINE
+	LOG "Update looks good. Now you can:"
+	LOG "  - press CTRL+C to cancel next step" 
+	LOG "  - or type 'y' to remove backup file"
+	LOG_LINE
+	PROMPT_YES_FOR_CONTINUE "Would you like to remove backup file?"
+	rm $backup
+}
 # -----------------------------------------------------------------------------
 # FAILURE prints error to stderr and exits the script with error code 1
 # -----------------------------------------------------------------------------
@@ -105,7 +135,7 @@ function REQUIRE_COMMAND
 	local tool=$1
 	local path=`which $tool`
 	if [ -z $path ]; then
-		FAILURE "$tool: command not found."
+		FAILURE "$tool: required command not found."
 	fi
 	set -e
 	DEBUG_LOG "$tool: found at $path"
@@ -124,7 +154,7 @@ function REQUIRE_COMMAND_PATH
 	local tool=$1
 	local path=`which $tool`
 	if [ -z $path ]; then
-		FAILURE "$tool: command not found."
+		FAILURE "$tool: required command not found."
 	fi
 	set -e
 	echo $path
@@ -234,37 +264,6 @@ function POP_DIR
 	else
 		popd > /dev/null
 	fi
-}
-
-###############################################################################
-# Self update function
-#
-# Why?
-#  - We have copy of this script in several repositiories, so it would be great
-#    to simply self update it from one central point
-# How?
-#  - type:  sh common-functions.sh selfupdate
- # -----------------------------------------------------------------------------
-function __COMMON_FUNCTIONS_SELF_UPDATE
-{
-	local self=$0
-	local backup=$self.backup
-	local remote="https://raw.githubusercontent.com/wultra/library-deploy/master/common-functions.sh"
-	LOG_LINE
-	LOG "This script is going to update itself:"
-	LOG "  source : $remote"
-	LOG "    dest : $self"
-	LOG_LINE
-	PROMPT_YES_FOR_CONTINUE
-	cp $self $backup
-	wget $remote -O $self
-	LOG_LINE
-	LOG "Update looks good. Now you can:"
-	LOG "  - press CTRL+C to cancel next step" 
-	LOG "  - or type 'y' to remove backup file"
-	LOG_LINE
-	PROMPT_YES_FOR_CONTINUE "Would you like to remove backup file?"
-	rm $backup
 }
 
 ###############################################################################
