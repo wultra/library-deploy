@@ -41,6 +41,9 @@ function USAGE
 	echo "                      specifies target for do-more.sh deployment"
 	echo "                      If specified, then only target will be executed"
 	echo ""
+	echo "    --any-branch      specifies that deployment is possible from"
+	echo "                      any branch. Be careful with this option."
+	echo ""
 	exit $1
 }
 
