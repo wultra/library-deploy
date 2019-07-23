@@ -44,6 +44,9 @@ function USAGE
 	echo "    --any-branch      specifies that deployment is possible from"
 	echo "                      any branch. Be careful with this option."
 	echo ""
+	echo "    --allow-warnings  forces deployment even if some step reported"
+	echo "                      an ignorable warning."
+	echo ""
 	exit $1
 }
 
@@ -62,6 +65,7 @@ COMMAND='all'
 VERSION=''
 REPO_DIR=''
 DO_MORE_TARGET=''
+ALLOW_WARNINGS=0
 
 # -----------------------------------------------------------------------------
 # Validate whether git branch is 'develop'
@@ -263,6 +267,9 @@ do
 		    DO_MORE_TARGET="$2"
 		    shift
 		    ;;
+		--allow-warnings)
+			ALLOW_WARNINGS=1
+			;;
 		*)
 			if [ x$PINDEX == x0 ]; then
 				REPO_DIR="$opt"

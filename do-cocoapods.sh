@@ -32,6 +32,9 @@ function DO_DEPLOY
 	if [ x$VERBOSE == x2 ]; then
 	    VERBOSE_SWITCH="--verbose"
 	fi
+	if [ x$ALLOW_WARNINGS == x1 ]; then
+		VERBOSE_SWITCH="${VERBOSE_SWITCH} --allow-warnings"
+	fi
 	
 	# validate variables and input parameters
 	VALIDATE_COCOAPODS
