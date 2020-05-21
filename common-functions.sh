@@ -266,6 +266,29 @@ function POP_DIR
 	fi
 }
 
+# -----------------------------------------------------------------------------
+# SHA256, SHA384, SHA512 calculates appropriate SHA hash for given file and 
+# prints the result hash to stdout. Example: $(SHA256 my-file.txt)
+#
+# Parameters:
+#   $1   - input file
+# -----------------------------------------------------------------------------
+function SHA256
+{
+	local HASH=( `shasum -a 256 "$1"` )
+	echo ${HASH[0]}
+}
+function SHA384
+{
+	local HASH=( `shasum -a 384 "$1"` )
+	echo ${HASH[0]}
+}
+function SHA512
+{
+	local HASH=( `shasum -a 512 "$1"` )
+	echo ${HASH[0]}
+}
+
 ###############################################################################
 # Global scope
 #   Gets full path to current directory and exits with error when 
