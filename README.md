@@ -34,6 +34,11 @@ For gradle projects, one file has to be updated with a new version:
 
 - `gradle.properties` - a file which typically contains a version of library
 - You can look into our [passphrase-meter](https://github.com/wultra/passphrase-meter/tree/develop/Deploy) library for examples. 
+
+For npm projects, one file has to be updated with a new version:
+
+- `package.json` - a file which typically contains a version of library
+- You can look into our [malwarelytics-cordova-plugin](https://github.com/wultra/malwarelytics-cordova-plugin/tree/develop/.deploy) library for examples. 
    
 ### Prepare `.limedeploy` file
 
@@ -62,6 +67,7 @@ Each line contains assignment to one global variable:
 - `DEPLOY_MODE` contains mode of deployment. Following modes are supported:
   - `cocoapods` - deployment with using `pod` tool
   - `gradle` - deployment with using `gradlew` tool
+  - `npm` - deployment with using `npm` tool
   - `more` - for a complex deployments with multiple deployment targets at once
 
 ### `cocoapods` mode parameters
@@ -74,6 +80,9 @@ Each line contains assignment to one global variable:
 - `DEPLOY_GRADLE_PARAMS` is required and specifying command line parameters for `gradle` for deployment task. For example: `clean build install bintrayUpload`
 - `DEPLOY_GRADLE_PREPARE_PARAMS` is optional and specifying command line parameters for `gradle` for prepare task. If not specified, then `clean assembleRelease` is used.
 - `DEPLOY_GRADLE_PATH` is optional and specifying path to `gradlew` wrapper script. If not specified, then path to repository is used.
+
+### `npm` mode parameters
+_No parameters available for this mode. `npm publish` is run in the repository._
 
 ### `more` mode parameters
 

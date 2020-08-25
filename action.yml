@@ -1,0 +1,21 @@
+name: 'Library Deploy'
+description: 'Library Deploy'
+inputs:
+  script-parameters: # all the parameters passed to the script
+    description: 'script parameters'
+    required: true
+  git-user-email:
+    description: 'email that will be displayed in the github commit'
+    required: false
+    default: 'github@wultra.com'
+  git-user-name:
+    description: 'name that will be displaed in the github commit'
+    required: false
+    default: 'Wultra Library Deploy'
+runs:
+  using: "composite"
+  steps: 
+    - run: |
+        pushd ${{ github.workspace }} && git config user.email "${{ inputs.git-user-email }}" && git config user.name "${{ inputs.git-user-name }}" && popd
+        ${{ github.action_path }}/deploy-build.sh ${{ github.workspace }} ${{ inputs.script-parameters }}
+      shell: bash
