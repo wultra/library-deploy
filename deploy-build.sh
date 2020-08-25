@@ -13,21 +13,21 @@ source "${TOP}/common-functions.sh"
 function USAGE
 {
 	echo ""
-	echo "Usage:  $CMD  repo-dir  version  [command]"
+	echo "Usage:  $CMD  repo-dir  version  [commands]"
 	echo ""
 	echo "repo-dir            path to git repository with library sources"
 	echo ""
 	echo "version             is version to be published to repositories"
 	echo "                      Only X.Y.Z format is accepted"
 	echo ""
-	echo "command             is command performed with the version:"
+	echo "commands            commands performed with the version:"
 	echo ""
 	echo "    prepare           prepare files for deployment"
 	echo "    push              push changes to git"
 	echo "    deploy            deploy changes to public repository"
 	echo "    merge             merges changes to master branch"
 	echo ""
-	echo "                    if command is not used, then script will"
+	echo "                    if no command is used, then script will"
 	echo "                    execute commands in following order:"
 	echo "                    'prepare', 'push', 'deploy' and 'merge'"
 	echo ""
@@ -36,6 +36,9 @@ function USAGE
 	echo "    -v1               print only basic log about build progress"
 	echo "    -v2               print full build log with rich debug info"
 	echo "    -h | --help       print this help information"
+	echo ""
+	echo "    --merge-mode mode    Mode of the merge step. Possible values are 'merge' or 'rebase'."
+	echo "                         If not specified, 'rebase' is used."
 	echo ""
 	echo "    -dm target | --do-more-target target"
 	echo "                      specifies target for do-more.sh deployment"
@@ -61,11 +64,12 @@ GIT_VALIDATE_DEVELOPMENT_BRANCH=1
 GIT_SKIP_TAGS=0
 GIT_ONLY_TAGS=0
 STANDARD_BRANCH=0
-COMMAND='all'
+COMMANDS=()
 VERSION=''
 REPO_DIR=''
 DO_MORE_TARGET=''
 ALLOW_WARNINGS=0
+MERGE_MODE='rebase'
 
 # -----------------------------------------------------------------------------
 # Validate whether git branch is 'develop'
@@ -235,7 +239,7 @@ function MERGE_TO_MASTER
 	LOG "----- Merging to '${MASTER_BRANCH}'..."
 	git fetch origin
 	git checkout ${MASTER_BRANCH}
-	git rebase origin/${DEV_BRANCH}
+	git ${MERGE_MODE} origin/${DEV_BRANCH}
 	git push
 	git checkout ${DEV_BRANCH}
 	####
@@ -261,7 +265,7 @@ do
 			GIT_VALIDATE_DEVELOPMENT_BRANCH=0
 			;;
 		prepare | push | deploy | merge)
-			COMMAND=$opt
+			COMMANDS+=("$opt")
 			;;
 		-dm | --do-more-target)
 		    DO_MORE_TARGET="$2"
@@ -269,6 +273,10 @@ do
 		    ;;
 		--allow-warnings)
 			ALLOW_WARNINGS=1
+			;;
+		--merge-mode)
+			MERGE_MODE="$2"
+			shift
 			;;
 		*)
 			if [ x$PINDEX == x0 ]; then
@@ -308,30 +316,35 @@ VALIDATE_GIT_STATUS
 LOAD_DEPLOY_INFO_FILE
 
 PUSH_DIR "${REPO_DIR}"
-####
-case "$COMMAND" in
-	prepare)
-		PREPARE_VERSIONING_FILES
-		EXECUTE_DO_DEPLOY $VERSION 'prepare'
-		;;
-	push)
-		PUSH_VERSIONING_FILES
-		;;
-	deploy)
-		EXECUTE_DO_DEPLOY $VERSION 'deploy'
-		;;
-	merge)
-		MERGE_TO_MASTER
-		;;
-	all)
-		PREPARE_VERSIONING_FILES
-		EXECUTE_DO_DEPLOY $VERSION 'prepare'
-		PUSH_VERSIONING_FILES
-		EXECUTE_DO_DEPLOY $VERSION 'deploy'
-		MERGE_TO_MASTER
-		;;	
-esac
-####
+
+
+# if there are no commands, execute everything
+if [ ${#COMMANDS[@]} -eq 0 ]; then
+	PREPARE_VERSIONING_FILES
+	EXECUTE_DO_DEPLOY $VERSION 'prepare'
+	PUSH_VERSIONING_FILES
+	EXECUTE_DO_DEPLOY $VERSION 'deploy'
+	MERGE_TO_MASTER
+else
+	for COMMAND in "${COMMANDS[@]}"; do
+		case "$COMMAND" in
+			prepare)
+				PREPARE_VERSIONING_FILES
+				EXECUTE_DO_DEPLOY $VERSION 'prepare'
+				;;
+			push)
+				PUSH_VERSIONING_FILES
+				;;
+			deploy)
+				EXECUTE_DO_DEPLOY $VERSION 'deploy'
+				;;
+			merge)
+				MERGE_TO_MASTER
+				;;
+		esac
+	done
+fi
+
 POP_DIR
 
 EXIT_SUCCESS
