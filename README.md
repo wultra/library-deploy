@@ -121,3 +121,36 @@ The script will perform following steps:
 - **merge** - merges all changes to **master** branch
 
 If you need to make custom changes, then you can perform each steps individually. Type `${DEP_TOOL}/deploy-build.sh -h` for details.
+
+## GitHub Actions Integration
+
+You can use this tool as a GitHub Action.
+
+Example usage:
+
+```yaml
+name: Release a new version
+
+on: 
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version of the library'
+        required: true
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Publish the library
+        uses: wultra/library-deploy@develop
+        with:
+          script-parameters: ${{ github.event.inputs.version }} prepare push deploy -v2
+        env:
+          # in case of npm, you need to setup .npmrc file with NPM_TOKEN
+          # and then pass this token as a environment variable
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} 
+```
