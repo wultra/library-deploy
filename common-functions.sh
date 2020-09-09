@@ -298,6 +298,7 @@ function SHA512
 # -----------------------------------------------------------------------------
 CMD=$(basename $0)
 TOP="`( cd \"$TOP\" && pwd )`"
+UPDATE_VERBOSE_COMMANDS
 if [ -z "$TOP" ]; then
     FAILURE "Current dir is not accessible."
 fi
