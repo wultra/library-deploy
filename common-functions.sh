@@ -33,7 +33,7 @@ function __COMMON_FUNCTIONS_SELF_UPDATE
 	LOG "  source : $remote"
 	LOG "    dest : $self"
 	LOG_LINE
-	PROMPT_YES_FOR_CONTINUE
+    PROMPT_YES_FOR_CONTINUE
 	cp $self $backup
 	wget $remote -O $self
 	LOG_LINE

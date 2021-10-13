@@ -68,6 +68,7 @@ Each line contains assignment to one global variable:
   - `cocoapods` - deployment with using `pod` tool
   - `gradle` - deployment with using `gradlew` tool
   - `npm` - deployment with using `npm` tool
+  - `script` - deployment with using any script located in the repository
   - `more` - for a complex deployments with multiple deployment targets at once
 
 ### `cocoapods` mode parameters
@@ -83,6 +84,13 @@ Each line contains assignment to one global variable:
 
 ### `npm` mode parameters
 _No parameters available for this mode. `npm publish` is run in the repository._
+
+### `script` mode parameters
+
+- `DEPLOY_SCRIPT_PREPARE` - script command to execute on "prepare" step. This variable is optional and can be omitted, if there's no prepare task available. The command may contain a `%DEPLOY_VERSION%` placeholder for an actual version.
+- `DEPLOY_SCRIPT_DEPLOY` - script command to execute on "deploy" step.  The command may contain a `%DEPLOY_VERSION%` placeholder for an actual version.
+
+> Note that you should use relative path to the repository, because the script commands are executed with the current dir set to the root of the local git repository.
 
 ### `more` mode parameters
 
