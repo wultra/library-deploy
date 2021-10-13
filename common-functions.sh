@@ -315,6 +315,21 @@ function GET_XCODE_VERSION
     esac
 }
 
+# -----------------------------------------------------------------------------
+# Prints value of property from Java property file into stdout. 
+# The format of file is:
+#   KEY1=VALUE1
+#   KEY2=VALUE2
+#
+# Parameters:
+#   $1   - property file
+#   $2   - property key to print
+# -----------------------------------------------------------------------------
+function GET_PROPERTY
+{
+    grep "^$2=" "$1" | cut -d'=' -f2
+}
+
 ###############################################################################
 # Global scope
 #   Gets full path to current directory and exits with error when 
