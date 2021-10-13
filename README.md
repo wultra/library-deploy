@@ -70,6 +70,8 @@ Each line contains assignment to one global variable:
   - `npm` - deployment with using `npm` tool
   - `script` - deployment with using any script located in the repository
   - `more` - for a complex deployments with multiple deployment targets at once
+- `DEPLOY_COMMANDS` is optional variable and if set, then may contains a default deployment steps required for the repository. Use bash string with steps in required order, for example `"prepare deploy push"`.
+- `DEPLOY_MAIN_BRANCH` is optional variable and if set, then may contains a name of `main` branch. If not set, then `master` is used.
 
 ### `cocoapods` mode parameters
 

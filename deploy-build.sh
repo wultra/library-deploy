@@ -136,6 +136,13 @@ function LOAD_DEPLOY_INFO_FILE
         DEPLOY_TAG_MESSAGE="Version ${VERSION}"
     fi
     
+    # Adjust main / master branch
+    if [ -z "$DEPLOY_MAIN_BRANCH" ]; then
+        MASTER_BRANCH='master'
+    else
+        MASTER_BRANCH=$DEPLOY_MAIN_BRANCH
+    fi
+    
     ####
     POP_DIR
 }
@@ -317,33 +324,34 @@ LOAD_DEPLOY_INFO_FILE
 
 PUSH_DIR "${REPO_DIR}"
 
-
-# if there are no commands, execute everything
 if [ ${#COMMANDS[@]} -eq 0 ]; then
-    PREPARE_VERSIONING_FILES
-    EXECUTE_DO_DEPLOY $VERSION 'prepare'
-    PUSH_VERSIONING_FILES
-    EXECUTE_DO_DEPLOY $VERSION 'deploy'
-    MERGE_TO_MASTER
-else
-    for COMMAND in "${COMMANDS[@]}"; do
-        case "$COMMAND" in
-            prepare)
-                PREPARE_VERSIONING_FILES
-                EXECUTE_DO_DEPLOY $VERSION 'prepare'
-                ;;
-            push)
-                PUSH_VERSIONING_FILES
-                ;;
-            deploy)
-                EXECUTE_DO_DEPLOY $VERSION 'deploy'
-                ;;
-            merge)
-                MERGE_TO_MASTER
-                ;;
-        esac
-    done
+    # if there are no commands, try look for DEPLOY_COMMANDS, or execute everything
+    if [ -z "$DEPLOY_COMMANDS" ]; then
+        DEBUG_LOG "Using default set of commands."
+        COMMANDS=( "prepare" "push" "deploy" "merge" )
+    else
+        DEBUG_LOG "Using default set of commands from .limedeploy file."
+        COMMANDS=( $DEPLOY_COMMANDS )
+    fi
 fi
+for COMMAND in "${COMMANDS[@]}"; do
+    case "$COMMAND" in
+        prepare)
+            PREPARE_VERSIONING_FILES
+            EXECUTE_DO_DEPLOY $VERSION 'prepare'
+            ;;
+        push)
+            PUSH_VERSIONING_FILES
+            ;;
+        deploy)
+            EXECUTE_DO_DEPLOY $VERSION 'deploy'
+            ;;
+        merge)
+            MERGE_TO_MASTER
+            ;;
+    esac
+done
+
 
 POP_DIR
 
