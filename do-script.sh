@@ -5,7 +5,9 @@
 # -----------------------------------------------------------------------------
 function VALIDATE_SCRIPT_PARAMS
 {
-    [[ -z "$DEPLOY_SCRIPT_DEPLOY" ]] && FAILURE "Missing \$DEPLOY_SCRIPT_DEPLOY variable in .limedeploy file."
+    if [ -z "$DEPLOY_SCRIPT_DEPLOY" ]; then
+        FAILURE "Missing \$DEPLOY_SCRIPT_DEPLOY variable in '$DEPLOY_INFO' file."
+    fi
 }
 
 # -----------------------------------------------------------------------------
@@ -35,7 +37,7 @@ function DO_DEPLOY
             DEBUG_LOG "Going to execute 'eval $EVAL_COMMAND'"
             eval $EVAL_COMMAND
         else
-            LOG "Skipping preparation step due to missing \$DEPLOY_SCRIPT_PREPARE variable in .limedeploy file."
+            LOG "Skipping preparation step due to missing \$DEPLOY_SCRIPT_PREPARE variable in '$DEPLOY_INFO' file."
         fi
         
     elif [ "$DEPLOY_COMMAND" == "deploy" ]; then

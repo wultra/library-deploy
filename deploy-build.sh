@@ -105,6 +105,8 @@ function VALIDATE_GIT_STATUS
 # -----------------------------------------------------------------------------
 function LOAD_DEPLOY_INFO_FILE
 {
+    DEBUG_LOG "Loading ${DEPLOY_INFO} info file..."
+    
     PUSH_DIR "${REPO_DIR}"
     ####
     if [ -f ${DEPLOY_INFO} ]; then
