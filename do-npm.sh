@@ -15,6 +15,10 @@ function VALIDATE_NPM
 # Parameters:
 #   $1   - version
 #   $2   - deploy command (push | prepare)
+#
+# Expected global variables
+#   DEPLOY_NPM_BEFORE_PREPARE       - optional script run before npm publish --dry-run
+#   DEPLOY_NPM_BEFORE_PUBLISH       - optional script run before npm publish
 # -----------------------------------------------------------------------------
 function DO_DEPLOY
 {
@@ -35,11 +39,13 @@ function DO_DEPLOY
     if [ "$DEPLOY_COMMAND" == "prepare" ]; then
         
         LOG "----- Validating..."
+        [[ ! -z "${DEPLOY_NPM_BEFORE_PREPARE}" ]] && npm run $DEPLOY_NPM_BEFORE_PREPARE
         npm publish --dry-run
         
     elif [ "$DEPLOY_COMMAND" == "deploy" ]; then
         
         LOG "----- Publishing..."
+        [[ ! -z "${DEPLOY_NPM_BEFORE_PUBLISH}" ]] && npm run $DEPLOY_NPM_BEFORE_PUBLISH
         npm publish
         
     else
