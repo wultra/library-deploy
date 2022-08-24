@@ -66,6 +66,7 @@ function WARNING
 # LOG_LINE 
 #    prints dashed line to stdout if VERBOSE is greater than 0
 #    Function also prevents that two lines will never be displayed subsequently
+#    if -a parameter is provided, then always prints dashed line 
 # DEBUG_LOG 
 #    Prints all parameters to stdout if VERBOSE is greater than 1
 # EXIT_SUCCESS
@@ -81,6 +82,7 @@ function LOG
 }
 function LOG_LINE
 {
+    [[ x$1 == 'x-a' ]] && LAST_LOG_IS_LINE=0
     if [ $LAST_LOG_IS_LINE -eq 0 ] && [ $VERBOSE -gt 0 ]; then
         echo "$CMD: -----------------------------------------------------------------------------"
         LAST_LOG_IS_LINE=1
