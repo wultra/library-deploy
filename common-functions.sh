@@ -9,10 +9,22 @@
 #     0  - disables logging to stdout
 #     1  - default logging to stdout
 #     2  - debug logging to stdout (depends on script)
+#  $VERBOSE_FOR_SCRIPT
+#     contains exact string as provided to SET_VERBOSE_LEVEL_FROM_SWITCH
+#  $VERBOSE_VARIANT1
+#     contains '-v' if VERBOSE==2, othherwise empty string
+#  $VERBOSE_VARIANT2
+#     contains '-verbose' if VERBOSE==2, othherwise empty string
+#  $VERBOSE_VARIANT3
+#     contains '--verbose' if VERBOSE==2, othherwise empty string
 # -----------------------------------------------------------------------------
 set -e
 set +v
 VERBOSE=1
+VERBOSE_FOR_SCRIPT=
+VERBOSE_VARIANT1=
+VERBOSE_VARIANT2=
+VERBOSE_VARIANT3=
 LAST_LOG_IS_LINE=0
 ###############################################################################
 # Self update function
@@ -175,6 +187,7 @@ function SET_VERBOSE_LEVEL_FROM_SWITCH
         -v2) VERBOSE=2 ;;
         *) FAILURE "Invalid verbose level $1" ;;
     esac
+    VERBOSE_FOR_SCRIPT=$1
     UPDATE_VERBOSE_COMMANDS
 }
 # -----------------------------------------------------------------------------
@@ -189,12 +202,18 @@ function UPDATE_VERBOSE_COMMANDS
 {
     if [ $VERBOSE -lt 2 ]; then
         # No verbose
+        VERBOSE_VARIANT1=
+        VERBOSE_VARIANT2=
+        VERBOSE_VARIANT3=
         CP="cp"
         RM="rm -f"
         MD="mkdir -p"
         MV="mv"
     else
         # verbose
+        VERBOSE_VARIANT1='-v'
+        VERBOSE_VARIANT2='-verbose'
+        VERBOSE_VARIANT3='--verbose'
         CP="cp -v"
         RM="rm -f -v"
         MD="mkdir -p -v"
