@@ -309,6 +309,11 @@ function SHA512
     local HASH=( `shasum -a 512 "$1"` )
     echo ${HASH[0]}
 }
+function SHA1
+{
+    local HASH=( `shasum -a 1 "$1"` )
+    echo ${HASH[0]}
+}
 
 # -----------------------------------------------------------------------------
 # Prints Xcode version into stdout or -1 in case of error.
