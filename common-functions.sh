@@ -138,6 +138,48 @@ function PROMPT_YES_FOR_CONTINUE
             ;;
     esac
 }
+
+# -----------------------------------------------------------------------------
+# PROMPT_CENTER_TEXT given prints text with leading and trailing spaces to
+# appear vertically centered on the screen.
+#
+# Parameters:
+# - $1 line width
+# - $2 text to center in line
+# -----------------------------------------------------------------------------
+function PROMPT_CENTER_TEXT
+{
+    local line=$1
+    local text="$2"
+    local width=${#text}
+    local leading=$(((line - width) / 2))
+    local trailing=$((line - width - leading))
+    local lead=$(printf "%*s" $leading)
+    local trail=$(printf "%*s" $trailing)
+    echo "$lead$text$trail"
+}
+# -----------------------------------------------------------------------------
+# PROMPT_PRINT prints box with information. You should use this function only
+# in scripts that require user's interaction.
+#
+# Parameters:
+# - $@ prompt to display and highlight. Treat each parameter as a whole line.
+# -----------------------------------------------------------------------------
+function PROMPT_PRINT
+{
+    if [ $VERBOSE -gt 0 ]; then
+        echo "$CMD:  ----------------------------------------------------------------------------"
+        echo "$CMD: |                                                                            |"
+        while [[ $# -gt 0 ]]; do
+            local text=$(PROMPT_CENTER_TEXT 76 "$1")
+            echo "$CMD: |$text|"
+            shift
+        done
+        echo "$CMD: |                                                                            |"
+        echo "$CMD:  ----------------------------------------------------------------------------"
+        LAST_LOG_IS_LINE=1
+    fi
+}
 # -----------------------------------------------------------------------------
 # REQUIRE_COMMAND uses "which" buildin command to test existence of requested
 # tool on the system.
