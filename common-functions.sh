@@ -79,6 +79,8 @@ function WARNING
 #    prints dashed line to stdout if VERBOSE is greater than 0
 #    Function also prevents that two lines will never be displayed subsequently
 #    if -a parameter is provided, then always prints dashed line 
+# LOG_CLEAR_LINE_FLAG
+#    Clears internal flag indicating that last log was line.
 # DEBUG_LOG 
 #    Prints all parameters to stdout if VERBOSE is greater than 1
 # EXIT_SUCCESS
@@ -113,6 +115,10 @@ function EXIT_SUCCESS
     LOG_LINE
     LOG "Success"
     exit 0
+}
+function LOG_CLEAR_LINE_FLAG
+{
+    LAST_LOG_IS_LINE=0
 }
 # -----------------------------------------------------------------------------
 # PROMPT_YES_FOR_CONTINUE asks user whether script should continue
@@ -355,6 +361,70 @@ function SHA1
 {
     local HASH=( `shasum -a 1 "$1"` )
     echo ${HASH[0]}
+}
+
+# -----------------------------------------------------------------------------
+# Hexadecimal utility functions:
+# HEX_TO_STR
+#    Converts hexadecimal characters into string (or raw bytes)
+# STR_TO_HEX
+#    Converts string (or raw bytes) into hexadecimal string
+# FILE_TO_HEX
+#    Converts content of file into hexadecimal string.
+# HEX_LENGTH
+#    Print number of bytes in hexadecimal string.
+# HEX_TO_SHORT
+#    Convert hexadecimal value into signed short.
+# -----------------------------------------------------------------------------
+function HEX_TO_STR
+{
+    echo "$1" | xxd -r -p
+}
+function STR_TO_HEX
+{
+    local val=$(printf %s "$1" | xxd -p)
+    STR_TO_UPPER ${val//$'\n'}
+}
+function FILE_TO_HEX
+{
+    local val=$(cat "$1" | xxd -p)
+    STR_TO_UPPER ${val//$'\n'}
+}
+function HEX_LENGTH
+{
+    local data=$1
+    local len=$((${#data} / 2))
+    local hexLen=$(echo "ibase=10;obase=16; ${len}" | bc)
+    if [ ${#hexLen} == 1 ]; then
+        echo 0$hexLen
+    else
+        echo $hexLen
+    fi
+}
+function HEX_TO_SHORT
+{
+    local value=$(echo "ibase=16; $1" | bc)
+    if (( value > 32767 )); then
+        value=$((value - 65536))
+    fi
+    echo $value
+}
+
+# -----------------------------------------------------------------------------
+# String utility functions
+# STR_TO_UPPER
+#    Make all characters in string uppercased
+# STR_TO_LOWER
+#    Make all characters in string lowercased
+# -----------------------------------------------------------------------------
+function STR_TO_UPPER
+{
+    echo $1 | tr '[:lower:]' '[:upper:]'
+}
+
+function STR_TO_LOWER
+{
+    echo $1 | tr '[:upper:]' '[:lower:]'
 }
 
 # -----------------------------------------------------------------------------
