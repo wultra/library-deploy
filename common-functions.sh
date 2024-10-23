@@ -421,10 +421,23 @@ function STR_TO_UPPER
 {
     echo $1 | tr '[:lower:]' '[:upper:]'
 }
-
 function STR_TO_LOWER
 {
     echo $1 | tr '[:upper:]' '[:lower:]'
+}
+
+# -----------------------------------------------------------------------------
+# Path utility functions
+# REAL_PATH
+#    Get real path to file. Unlike builtin realpath function, this resolves the
+#    parent directory, so the target file may not exit.
+# -----------------------------------------------------------------------------
+function REAL_PATH
+{
+    local path=$1
+    local dir=$(realpath $(dirname "$path"))
+    local fname=$(basename "$path")
+    echo $dir/$fname
 }
 
 # -----------------------------------------------------------------------------
