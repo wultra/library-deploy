@@ -12,11 +12,11 @@
 #  $VERBOSE_FOR_SCRIPT
 #     contains exact string as provided to SET_VERBOSE_LEVEL_FROM_SWITCH
 #  $VERBOSE_VARIANT1
-#     contains '-v' if VERBOSE==2, othherwise empty string
+#     contains '-v' if VERBOSE==2, otherwise empty string
 #  $VERBOSE_VARIANT2
-#     contains '-verbose' if VERBOSE==2, othherwise empty string
+#     contains '-verbose' if VERBOSE==2, otherwise empty string
 #  $VERBOSE_VARIANT3
-#     contains '--verbose' if VERBOSE==2, othherwise empty string
+#     contains '--verbose' if VERBOSE==2, otherwise empty string
 # -----------------------------------------------------------------------------
 set -e
 set +v
@@ -269,7 +269,11 @@ function UPDATE_VERBOSE_COMMANDS
     fi
 }
 # -----------------------------------------------------------------------------
-# Validate if $1 as VERSION has valid format: x.y.z
+# Validate if $1 as VERSION has valid format: 
+#  - x.y.z (production version)
+#  - x.y.z-alphaN (alpha version)
+#  - x.y.z-betaN (beta version)
+#  - x.y.z-rcN (release candidate version)
 # Also sets global VERSION to $1 if VERSION string is empty.
 # -----------------------------------------------------------------------------
 function VALIDATE_AND_SET_VERSION_STRING
@@ -277,7 +281,7 @@ function VALIDATE_AND_SET_VERSION_STRING
     if [ -z "$1" ]; then
         FAILURE "Version string is empty"
     fi
-    local rx='^([0-9]+\.){2}(\*|[0-9]+)$'
+    local rx='^([0-9]+)\.([0-9]+)\.([0-9]+)(-(alpha|beta|rc)([0-9]+))?$'
     if [[ ! "$1" =~ $rx ]]; then
         FAILURE "Version string is invalid: '$1'"
     fi
