@@ -274,7 +274,8 @@ function UPDATE_VERBOSE_COMMANDS
 #  - x.y.z-alphaN (alpha version)
 #  - x.y.z-betaN (beta version)
 #  - x.y.z-rcN (release candidate version)
-# Also sets global VERSION to $1 if VERSION string is empty.
+# Also sets global VERSION to $1 and VERSION_PRE_RELEASE to 0 or 1, depending
+# on whether version string is for production or pre-release.
 # -----------------------------------------------------------------------------
 function VALIDATE_AND_SET_VERSION_STRING
 {
@@ -285,11 +286,17 @@ function VALIDATE_AND_SET_VERSION_STRING
     if [[ ! "$1" =~ $rx ]]; then
         FAILURE "Version string is invalid: '$1'"
     fi
-    if [ -z "$VERSION" ]; then
-        VERSION=$1
-        DEBUG_LOG "Changing version to $VERSION"
+    if [ ! -z "$VERSION" ]; then
+        WARNING "Global Version string is already set to $VERSION"
+    fi
+    VERSION=$1
+    rx='^[0-9]+\.[0-9]+\.[0-9]+-(alpha|beta|rc)[0-9]*$'
+    if [[ "$1" =~ $rx ]]; then
+        VERSION_PRE_RELEASE=1
+        DEBUG_LOG "Changing global version to $VERSION (pre-release)"
     else
-        FAILURE "Version string is already set to $VERSION"
+        VERSION_PRE_RELEASE=0
+        DEBUG_LOG "Changing global version to $VERSION (production)"
     fi
 }
 # -----------------------------------------------------------------------------
